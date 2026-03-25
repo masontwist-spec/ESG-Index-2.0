@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Companies | FTSE ESG Exposure Index</title>
+<link rel="stylesheet" href="styles.css">
+<script defer src="data.js"></script><script defer src="companies.js"></script>
+</head><body>
+<header><div class="wrap nav"><div class="brand"><div class="brand-mark">◔</div><div class="brand-name">FTSE ESG Index</div></div><nav class="nav-links"><a href="index.html">Overview</a>
+<a href="rankings.html">Rankings</a>
+<a href="methodology.html">Methodology</a>
+<a href="companies.html" class="active">Companies</a></nav></div></header>
+<section class="page"><div class="wrap-wide">
+<div class="section-head"><div><h1>Companies</h1><p>A clean company directory view with exposure score, rank, and sector.</p></div></div>
+<div class="toolbar">
+<input class="control" id="searchInput" placeholder="Search company or ticker...">
+<select class="control" id="sectorFilter"><option value="">All sectors</option></select>
+<select class="control" id="tierFilter"><option value="">All tiers</option><option value="best">Best</option><option value="good">Good</option><option value="moderate">Moderate</option><option value="poor">Poor</option><option value="wasteful">Wasteful</option></select>
+</div>
+<div class="table-card"><div class="table-wrap"><table><thead><tr><th data-sort="rank">#</th><th data-sort="Company">Company</th><th data-sort="Ticker">Ticker</th><th data-sort="Sector">Sector</th><th data-sort="Environment_Score">Exposure Score</th><th data-sort="tier">Tier</th></tr></thead><tbody id="tableBody"></tbody></table></div></div>
+</div></section>
+<footer class="foot"><div class="wrap-wide">Companies page for the static multi-page site.</div></footer>
+</body></html>
