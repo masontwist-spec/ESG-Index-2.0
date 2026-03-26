@@ -197,7 +197,7 @@ body:has(#sectorBarChart) .section-head p {
 }
 /* Homepage mini-chart title fix */
 .overview-mini-head h2 {
-  font-size: clamp(20px, 2.2vw, 28px) !important;
+  font-size: 24px !important;   /* ← clean fixed size */
   line-height: 1.08 !important;
   margin: 0 0 8px 0 !important;
   white-space: normal !important;
