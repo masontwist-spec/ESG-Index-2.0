@@ -63,24 +63,24 @@ function renderStats(sectors) {
   const tightest = [...sectors].sort((a, b) => a.range - b.range)[0];
 
   grid.innerHTML = `
-    <div class="card stat-card">
+    <div class="card stat-card sector-stat-card">
       <div class="stat-label">Best Sector</div>
-      <div class="stat-value">${best.sector}</div>
+      <div class="stat-value sector-stat-value">${best.sector}</div>
       <div class="stat-note">Avg score: ${fmt(best.avgScore)}</div>
     </div>
-    <div class="card stat-card">
+    <div class="card stat-card sector-stat-card">
       <div class="stat-label">Worst Sector</div>
-      <div class="stat-value">${worst.sector}</div>
+      <div class="stat-value sector-stat-value">${worst.sector}</div>
       <div class="stat-note">Avg score: ${fmt(worst.avgScore)}</div>
     </div>
-    <div class="card stat-card">
+    <div class="card stat-card sector-stat-card">
       <div class="stat-label">Widest Spread</div>
-      <div class="stat-value">${widest.sector}</div>
+      <div class="stat-value sector-stat-value">${widest.sector}</div>
       <div class="stat-note">Range: ${fmt(widest.range)}</div>
     </div>
-    <div class="card stat-card">
+    <div class="card stat-card sector-stat-card">
       <div class="stat-label">Most Consistent</div>
-      <div class="stat-value">${tightest.sector}</div>
+      <div class="stat-value sector-stat-value">${tightest.sector}</div>
       <div class="stat-note">Range: ${fmt(tightest.range)}</div>
     </div>
   `;
