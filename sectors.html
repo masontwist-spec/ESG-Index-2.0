@@ -3,63 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sectors | ESG Exposure Index 2026</title>
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <title>Sectors | FTSE 100 ESG Exposure Index</title>
+  <link rel="stylesheet" href="assets/css/sectors.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Sector Analysis</h1>
-    <nav>
-      <a href="index.html">Overview</a>
-      <a href="rankings.html">Rankings</a>
-      <a href="methodology.html">Methodology</a>
-      <a href="companies.html">Companies</a>
-      <a href="sectors.html" class="active">Sectors</a>
-    </nav>
-    <p>
-      Sector scores are calculated as the average ESG Exposure score of constituent companies.
-      Lower scores are better under this contrarian methodology.
-    </p>
+  <header class="site-header">
+    <div class="container">
+      <div class="eyebrow">Prosperity Institute FTSE 100 ESG Exposure Index</div>
+      <nav class="site-nav">
+        <a href="index.html">Overview</a>
+        <a href="rankings.html">Rankings</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="companies.html">Companies</a>
+        <a href="sectors.html" class="active">Sectors</a>
+      </nav>
+
+      <section class="hero">
+        <p class="hero-kicker">FTSE 100 ESG Exposure Analysis</p>
+        <h1>Sectors</h1>
+        <p class="hero-text">
+          Sector-level view of the index. Lower exposure scores are better.
+          Higher scores reflect greater ESG-related commitments, reporting intensity,
+          and transition activity under this contrarian framework.
+        </p>
+      </section>
+    </div>
   </header>
 
-  <main>
-    <section id="sector-summary" class="card-grid"></section>
+  <main class="container main-content">
+    <section id="sectorSummary" class="summary-grid"></section>
 
-    <section class="chart-card">
-      <h2>Sector Ranking</h2>
-      <div id="sectorBarChart"></div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Sector Ranking</h2>
+        <p>Average exposure score by sector, sorted best to worst.</p>
+      </div>
+      <div id="sectorBarChart" class="chart"></div>
     </section>
 
-    <section class="chart-card">
-      <h2>Sector Score Distribution</h2>
-      <div id="sectorBoxPlot"></div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Sector Score Distribution</h2>
+        <p>Spread of company scores inside each sector.</p>
+      </div>
+      <div id="sectorBoxPlot" class="chart"></div>
     </section>
 
-    <section class="chart-card">
-      <h2>Average E / S / G Contribution by Sector</h2>
-      <div id="sectorStackedBar"></div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Average Component Breakdown by Sector</h2>
+        <p>How each sector scores on Climate Targets, Investment &amp; Transition, and Climate Reporting.</p>
+      </div>
+      <div id="sectorStackedChart" class="chart"></div>
     </section>
 
-    <section class="table-card">
-      <h2>Sector Detail Table</h2>
-      <table id="sectorTable">
-        <thead>
-          <tr>
-            <th>Sector</th>
-            <th>Companies</th>
-            <th>Avg Score</th>
-            <th>Median</th>
-            <th>Best Company</th>
-            <th>Worst Company</th>
-            <th>Range</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Sector Detail Table</h2>
+        <p>Best = lowest average score. Worst = highest average score.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table id="sectorTable">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Sector</th>
+              <th>Companies</th>
+              <th>Avg Score</th>
+              <th>Median</th>
+              <th>Best Company</th>
+              <th>Worst Company</th>
+              <th>Range</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
+  <footer class="site-footer">
+    <div class="container">
+      Prosperity Institute's FTSE 100 ESG Exposure Index.
+    </div>
+  </footer>
+
+  <!--
+    IMPORTANT:
+    This page expects a global RAW_DATA array to exist before sectors.js runs.
+
+    Easiest setup:
+    1) Put your company dataset into assets/js/data.js
+    2) Make sure it looks like: const RAW_DATA = [ ... ];
+    3) Keep the script tag below enabled.
+
+    If your data already lives somewhere else, just replace this script tag
+    with the correct file path.
+  -->
   <script src="assets/js/data.js"></script>
   <script src="assets/js/sectors.js"></script>
 </body>
