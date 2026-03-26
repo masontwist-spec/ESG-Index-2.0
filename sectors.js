@@ -1,13 +1,3 @@
-function toNumber(value) {
-  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-  if (typeof value === "string") {
-    const cleaned = value.replace(/,/g, "").trim();
-    const parsed = Number(cleaned);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-  return 0;
-}
-
 function mean(arr) {
   if (!arr.length) return 0;
   return arr.reduce((sum, val) => sum + val, 0) / arr.length;
@@ -15,108 +5,44 @@ function mean(arr) {
 
 function median(arr) {
   if (!arr.length) return 0;
-  const s = [...arr].sort((a, b) => a - b);
-  const mid = Math.floor(s.length / 2);
-  return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
 }
 
 function fmt(num) {
-  return toNumber(num).toFixed(3);
-}
-
-function pick(obj, keys) {
-  for (const key of keys) {
-    if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
-      return obj[key];
-    }
-  }
-  return null;
-}
-
-function getCompanyName(row) {
-  return (
-    pick(row, ["Company", "Company Name", "Name"]) ||
-    "Unknown"
-  );
-}
-
-function getSector(row) {
-  return (
-    pick(row, ["Sector", "sector"]) ||
-    "Unclassified"
-  );
-}
-
-function getClimateTargets(row) {
-  return toNumber(pick(row, ["Climate_Targets", "Climate Targets"]));
-}
-
-function getInvestmentTransition(row) {
-  return toNumber(
-    pick(row, [
-      "Investment_Transition",
-      "Investment & Transition",
-      "Inv. & Transition"
-    ])
-  );
-}
-
-function getClimateReporting(row) {
-  return toNumber(pick(row, ["Climate_Reporting", "Climate Reporting"]));
-}
-
-function getTotalScore(row) {
-  const direct = pick(row, [
-    "Total_Score",
-    "Total Score",
-    "ESG_Exposure_Score",
-    "ESG Exposure Score",
-    "Exposure_Score",
-    "Exposure Score",
-    "Environment_Score",
-    "Environment Score"
-  ]);
-
-  if (direct !== null) return toNumber(direct);
-
-  return (
-    getClimateTargets(row) +
-    getInvestmentTransition(row) +
-    getClimateReporting(row)
-  );
+  return Number(num).toFixed(3);
 }
 
 function buildSectorData(data) {
   const grouped = {};
 
   data.forEach((row) => {
-    const sector = getSector(row);
+    const sector = row.Sector || "Unclassified";
     if (!grouped[sector]) grouped[sector] = [];
-    grouped[sector].push({
-      name: getCompanyName(row),
-      totalScore: getTotalScore(row),
-      climateTargets: getClimateTargets(row),
-      investmentTransition: getInvestmentTransition(row),
-      climateReporting: getClimateReporting(row)
-    });
+    grouped[sector].push(row);
   });
 
   const sectors = Object.entries(grouped).map(([sector, companies]) => {
-    const scores = companies.map(c => c.totalScore).sort((a, b) => a - b);
-    const bestCompany = [...companies].sort((a, b) => a.totalScore - b.totalScore)[0];
-    const worstCompany = [...companies].sort((a, b) => b.totalScore - a.totalScore)[0];
+    const sortedCompanies = [...companies].sort(
+      (a, b) => a.Environment_Score - b.Environment_Score
+    );
+
+    const scores = sortedCompanies.map(c => c.Environment_Score);
 
     return {
       sector,
       count: companies.length,
       avgScore: mean(scores),
       medianScore: median(scores),
-      range: scores.length ? Math.max(...scores) - Math.min(...scores) : 0,
-      bestCompany: bestCompany ? bestCompany.name : "N/A",
-      worstCompany: worstCompany ? worstCompany.name : "N/A",
-      avgClimateTargets: mean(companies.map(c => c.climateTargets)),
-      avgInvestmentTransition: mean(companies.map(c => c.investmentTransition)),
-      avgClimateReporting: mean(companies.map(c => c.climateReporting)),
+      range: Math.max(...scores) - Math.min(...scores),
+      bestCompany: sortedCompanies[0].Company,
+      worstCompany: sortedCompanies[sortedCompanies.length - 1].Company,
+      avgClimateTargets: mean(companies.map(c => c.Climate_Targets)),
+      avgInvestmentTransition: mean(companies.map(c => c.Investment_Transition)),
+      avgClimateReporting: mean(companies.map(c => c.Climate_Reporting)),
       companyScores: scores
     };
   });
@@ -211,7 +137,7 @@ function renderBarChart(sectors) {
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     margin: { l: 180, r: 40, t: 10, b: 40 },
-    xaxis: { title: "Average ESG Exposure Score" },
+    xaxis: { title: "Average Environment Score" },
     yaxis: { automargin: true }
   }, {
     responsive: true,
@@ -232,7 +158,7 @@ function renderBoxPlot(sectors) {
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     margin: { l: 60, r: 30, t: 10, b: 110 },
-    yaxis: { title: "Company ESG Exposure Score" },
+    yaxis: { title: "Company Environment Score" },
     xaxis: { tickangle: -30 }
   }, {
     responsive: true,
