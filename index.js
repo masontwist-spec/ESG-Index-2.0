@@ -5,30 +5,44 @@ function renderDistributionChart(data) {
   const scores = data.map(d => d.Environment_Score);
 
   Plotly.newPlot('distributionChart', [
-    {
-      type: 'histogram',
-      x: scores,
-      nbinsx: 12,
-      marker: {
-        color: '#2e8b57'
-      },
-      hovertemplate: 'Count: %{y}<br>Score range: %{x}<extra></extra>'
-    }
-  ], {
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    margin: { l: 40, r: 20, t: 10, b: 40 },
-    xaxis: {
-      title: 'Environment Score',
-      tickformat: '.2f'
+  {
+    type: 'histogram',
+    x: scores,
+    nbinsx: 12,
+    marker: { color: '#2e8b57' },
+    hovertemplate: 'Count: %{y}<br>Score range: %{x}<extra></extra>'
+  }
+], {
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+
+  margin: { l: 45, r: 20, t: 10, b: 40 },
+
+  font: {
+    size: 11 
+  },
+
+  xaxis: {
+    title: {
+      text: 'Environment Score',
+      font: { size: 11 }
     },
-    yaxis: {
-      title: 'Number of Companies'
-    }
-  }, {
-    responsive: true,
-    displayModeBar: false
-  });
+    tickfont: { size: 10 },
+    tickformat: '.2f'
+  },
+
+  yaxis: {
+    title: {
+      text: 'Number of Companies',
+      font: { size: 11 }
+    },
+    tickfont: { size: 10 }
+  }
+
+}, {
+  responsive: true,
+  displayModeBar: false
+});
 }
 
 document.addEventListener('DOMContentLoaded', () => {
