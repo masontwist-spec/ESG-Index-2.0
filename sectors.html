@@ -1,95 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sectors | FTSE 100 ESG Exposure Index</title>
- <link rel="stylesheet" href="sectors.css" />
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sector Analysis | FTSE 100 ESG Exposure Index</title>
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script defer src="data.js"></script>
+  <script defer src="sectors.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container">
-      <div class="eyebrow">Prosperity Institute FTSE 100 ESG Exposure Index</div>
-      <nav class="site-nav">
+  <header>
+    <div class="wrap nav">
+      <div class="brand">
+        <div class="brand-mark">↗</div>
+        <div class="brand-name">Prosperity Institute FTSE 100 <strong>ESG Exposure</strong> Index</div>
+      </div>
+      <nav class="nav-links">
         <a href="index.html">Overview</a>
         <a href="rankings.html">Rankings</a>
         <a href="methodology.html">Methodology</a>
         <a href="companies.html">Companies</a>
         <a href="sectors.html" class="active">Sectors</a>
       </nav>
-
-      <section class="hero">
-        <p class="hero-kicker">FTSE 100 ESG Exposure Analysis</p>
-        <h1>Sectors</h1>
-        <p class="hero-text">
-          Sector-level view of the index. Lower exposure scores are better.
-          Higher scores reflect greater ESG-related commitments, reporting intensity,
-          and transition activity under this contrarian framework.
-        </p>
-      </section>
     </div>
   </header>
 
-  <main class="container main-content">
-    <section id="sectorSummary" class="summary-grid"></section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Sector Ranking</h2>
-        <p>Average exposure score by sector, sorted best to worst.</p>
-      </div>
-      <div id="sectorBarChart" class="chart"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Sector Score Distribution</h2>
-        <p>Spread of company scores inside each sector.</p>
-      </div>
-      <div id="sectorBoxPlot" class="chart"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Average Component Breakdown by Sector</h2>
-        <p>How each sector scores on Climate Targets, Investment &amp; Transition, and Climate Reporting.</p>
-      </div>
-      <div id="sectorStackedChart" class="chart"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel-head">
-        <h2>Sector Detail Table</h2>
-        <p>Best = lowest average score. Worst = highest average score.</p>
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <div class="eyebrow">FTSE 100 ESG Exposure Analysis</div>
+        <h1>Sector <span class="accent">Analysis</span></h1>
+        <p>
+          A sector-level view of the index. Higher scores reflect greater ESG-related
+          commitments, reporting intensity, and transition activity. Lower scores rank better.
+        </p>
       </div>
 
-      <div class="table-wrap">
-        <table id="sectorTable">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Sector</th>
-              <th>Companies</th>
-              <th>Avg Score</th>
-              <th>Median</th>
-              <th>Best Company</th>
-              <th>Worst Company</th>
-              <th>Range</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div class="hero-panel">
+        <h3>Interpretation</h3>
+        <p>
+          Sector scores are calculated from the company-level ESG exposure data already used
+          across the site.
+        </p>
+        <div class="signal-list">
+          <div class="signal"><span class="name">Best sector</span><span class="tag">Lowest average</span></div>
+          <div class="signal"><span class="name">Worst sector</span><span class="tag" style="background:rgba(240,120,120,0.12);color:#f0a0a0;">Highest average</span></div>
+          <div class="signal"><span class="name">Ranking logic</span><span class="tag">Ascending</span></div>
+        </div>
       </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container">
-      Prosperity Institute's FTSE 100 ESG Exposure Index.
     </div>
+  </section>
+
+  <div class="stats-strip">
+    <div class="wrap stats-grid" id="sectorStatsGrid"></div>
+  </div>
+
+  <section class="page">
+    <div class="wrap">
+      <div class="overview-grid">
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <h2>Sector Rankings</h2>
+              <p>Average ESG exposure score by sector, sorted from lowest to highest.</p>
+            </div>
+          </div>
+          <div id="sectorBarChart" style="width:100%;height:520px;"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <div>
+              <h2>Sector Detail</h2>
+              <p>Summary statistics for each sector in the index.</p>
+            </div>
+          </div>
+          <div id="sectorLeaderboardList" class="leaderboard-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="wrap">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Score Distribution by Sector</h2>
+            <p>Shows the spread of company scores inside each sector.</p>
+          </div>
+        </div>
+        <div id="sectorBoxPlot" style="width:100%;height:520px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="wrap">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Average Component Breakdown</h2>
+            <p>Average contribution from Climate Targets, Investment & Transition, and Climate Reporting.</p>
+          </div>
+        </div>
+        <div id="sectorStackedChart" style="width:100%;height:520px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="page">
+    <div class="wrap">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2>Sector Table</h2>
+            <p>Best sectors have lower average ESG exposure scores.</p>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:12px;">Rank</th>
+                <th style="text-align:left; padding:12px;">Sector</th>
+                <th style="text-align:left; padding:12px;">Companies</th>
+                <th style="text-align:left; padding:12px;">Avg Score</th>
+                <th style="text-align:left; padding:12px;">Median</th>
+                <th style="text-align:left; padding:12px;">Best Company</th>
+                <th style="text-align:left; padding:12px;">Worst Company</th>
+                <th style="text-align:left; padding:12px;">Range</th>
+              </tr>
+            </thead>
+            <tbody id="sectorTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap">Prosperity Institute's FTSE 100 <strong>ESG Exposure</strong> Index.</div>
   </footer>
-  <script src="data.js"></script>
-<script src="sectors.js"></script>
 </body>
 </html>
