@@ -190,7 +190,6 @@ function initSectorsPage() {
 
   const sectors = buildSectorData(RAW_DATA);
   renderStats(sectors);
-  renderSectorList(sectors);
   renderTable(sectors);
   renderBarChart(sectors);
   renderBoxPlot(sectors);
