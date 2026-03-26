@@ -1,324 +1,291 @@
-(function () {
-  function toNumber(value) {
-    if (typeof value === "number") return Number.isFinite(value) ? value : 0;
-    if (typeof value === "string") {
-      const cleaned = value.replace(/,/g, "").trim();
-      const parsed = Number(cleaned);
-      return Number.isFinite(parsed) ? parsed : 0;
+function toNumber(value) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "string") {
+    const cleaned = value.replace(/,/g, "").trim();
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function mean(arr) {
+  if (!arr.length) return 0;
+  return arr.reduce((sum, val) => sum + val, 0) / arr.length;
+}
+
+function median(arr) {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 === 0 ? (s[mid - 1] + s[mid]) / 2 : s[mid];
+}
+
+function fmt(num) {
+  return toNumber(num).toFixed(3);
+}
+
+function pick(obj, keys) {
+  for (const key of keys) {
+    if (obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+      return obj[key];
     }
-    return 0;
   }
+  return null;
+}
 
-  function mean(values) {
-    if (!values.length) return 0;
-    return values.reduce((sum, value) => sum + value, 0) / values.length;
-  }
+function getCompanyName(row) {
+  return (
+    pick(row, ["Company", "Company Name", "Name"]) ||
+    "Unknown"
+  );
+}
 
-  function median(values) {
-    if (!values.length) return 0;
-    const sorted = [...values].sort((a, b) => a - b);
-    const mid = Math.floor(sorted.length / 2);
-    return sorted.length % 2 === 0
-      ? (sorted[mid - 1] + sorted[mid]) / 2
-      : sorted[mid];
-  }
+function getSector(row) {
+  return (
+    pick(row, ["Sector", "sector"]) ||
+    "Unclassified"
+  );
+}
 
-  function formatScore(value) {
-    return toNumber(value).toFixed(3);
-  }
+function getClimateTargets(row) {
+  return toNumber(pick(row, ["Climate_Targets", "Climate Targets"]));
+}
 
-  function getScore(row) {
-    // Tries several likely field names to make integration easier.
-    const direct =
-      row.Exposure_Score ??
-      row["Exposure Score"] ??
-      row.Total_Score ??
-      row["Total Score"] ??
-      row.ESG_Exposure_Score ??
-      row["ESG Exposure Score"];
+function getInvestmentTransition(row) {
+  return toNumber(
+    pick(row, [
+      "Investment_Transition",
+      "Investment & Transition",
+      "Inv. & Transition"
+    ])
+  );
+}
 
-    if (direct !== undefined && direct !== null && direct !== "") {
-      return toNumber(direct);
-    }
+function getClimateReporting(row) {
+  return toNumber(pick(row, ["Climate_Reporting", "Climate Reporting"]));
+}
 
-    // Fallback to summing the three environmental components currently visible on your site.
-    return (
-      toNumber(row.Climate_Targets ?? row["Climate Targets"]) +
-      toNumber(row.Investment_Transition ?? row["Investment & Transition"] ?? row["Inv. & Transition"]) +
-      toNumber(row.Climate_Reporting ?? row["Climate Reporting"])
-    );
-  }
+function getTotalScore(row) {
+  const direct = pick(row, [
+    "Total_Score",
+    "Total Score",
+    "ESG_Exposure_Score",
+    "ESG Exposure Score",
+    "Exposure_Score",
+    "Exposure Score",
+    "Environment_Score",
+    "Environment Score"
+  ]);
 
-  function getComponent(row, keys) {
-    for (const key of keys) {
-      if (row[key] !== undefined && row[key] !== null && row[key] !== "") {
-        return toNumber(row[key]);
-      }
-    }
-    return 0;
-  }
+  if (direct !== null) return toNumber(direct);
 
-  function buildSectorData(data) {
-    const grouped = {};
+  return (
+    getClimateTargets(row) +
+    getInvestmentTransition(row) +
+    getClimateReporting(row)
+  );
+}
 
-    data.forEach((row) => {
-      const sector = (row.Sector || "Unclassified").trim();
-      if (!grouped[sector]) grouped[sector] = [];
-      grouped[sector].push(row);
+function buildSectorData(data) {
+  const grouped = {};
+
+  data.forEach((row) => {
+    const sector = getSector(row);
+    if (!grouped[sector]) grouped[sector] = [];
+    grouped[sector].push({
+      name: getCompanyName(row),
+      totalScore: getTotalScore(row),
+      climateTargets: getClimateTargets(row),
+      investmentTransition: getInvestmentTransition(row),
+      climateReporting: getClimateReporting(row)
     });
+  });
 
-    const sectorRows = Object.entries(grouped).map(([sector, companies]) => {
-      const rows = companies.map((company) => {
-        const score = getScore(company);
-        return {
-          name: company.Company || company["Company Name"] || company.Name || "Unknown",
-          score,
-          climateTargets: getComponent(company, ["Climate_Targets", "Climate Targets"]),
-          investmentTransition: getComponent(company, ["Investment_Transition", "Investment & Transition", "Inv. & Transition"]),
-          climateReporting: getComponent(company, ["Climate_Reporting", "Climate Reporting"])
-        };
-      });
+  const sectors = Object.entries(grouped).map(([sector, companies]) => {
+    const scores = companies.map(c => c.totalScore).sort((a, b) => a - b);
+    const bestCompany = [...companies].sort((a, b) => a.totalScore - b.totalScore)[0];
+    const worstCompany = [...companies].sort((a, b) => b.totalScore - a.totalScore)[0];
 
-      const scores = rows.map((row) => row.score).sort((a, b) => a - b);
-      const bestCompany = rows.reduce((best, current) => current.score < best.score ? current : best, rows[0]);
-      const worstCompany = rows.reduce((worst, current) => current.score > worst.score ? current : worst, rows[0]);
+    return {
+      sector,
+      count: companies.length,
+      avgScore: mean(scores),
+      medianScore: median(scores),
+      range: scores.length ? Math.max(...scores) - Math.min(...scores) : 0,
+      bestCompany: bestCompany ? bestCompany.name : "N/A",
+      worstCompany: worstCompany ? worstCompany.name : "N/A",
+      avgClimateTargets: mean(companies.map(c => c.climateTargets)),
+      avgInvestmentTransition: mean(companies.map(c => c.investmentTransition)),
+      avgClimateReporting: mean(companies.map(c => c.climateReporting)),
+      companyScores: scores
+    };
+  });
 
-      return {
-        sector,
-        count: rows.length,
-        avgScore: mean(scores),
-        medianScore: median(scores),
-        range: scores.length ? Math.max(...scores) - Math.min(...scores) : 0,
-        bestCompany: bestCompany ? bestCompany.name : "N/A",
-        worstCompany: worstCompany ? worstCompany.name : "N/A",
-        avgClimateTargets: mean(rows.map((row) => row.climateTargets)),
-        avgInvestmentTransition: mean(rows.map((row) => row.investmentTransition)),
-        avgClimateReporting: mean(rows.map((row) => row.climateReporting)),
-        companyScores: scores
-      };
-    });
+  return sectors.sort((a, b) => a.avgScore - b.avgScore).map((s, i) => ({
+    ...s,
+    rank: i + 1
+  }));
+}
 
-    return sectorRows.sort((a, b) => a.avgScore - b.avgScore).map((row, index) => ({
-      ...row,
-      rank: index + 1
-    }));
-  }
+function renderStats(sectors) {
+  const grid = document.getElementById("sectorStatsGrid");
+  if (!grid) return;
 
-  function renderSummaryCards(sectors) {
-    const container = document.getElementById("sectorSummary");
-    if (!container || !sectors.length) return;
+  const best = sectors[0];
+  const worst = sectors[sectors.length - 1];
+  const widest = [...sectors].sort((a, b) => b.range - a.range)[0];
+  const tightest = [...sectors].sort((a, b) => a.range - b.range)[0];
 
-    const best = sectors[0];
-    const worst = sectors[sectors.length - 1];
-    const widestSpread = [...sectors].sort((a, b) => b.range - a.range)[0];
-    const mostCompact = [...sectors].sort((a, b) => a.range - b.range)[0];
+  grid.innerHTML = `
+    <div class="card stat-card">
+      <div class="stat-label">Best Sector</div>
+      <div class="stat-value">${best.sector}</div>
+      <div class="stat-note">Avg score: ${fmt(best.avgScore)}</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Worst Sector</div>
+      <div class="stat-value">${worst.sector}</div>
+      <div class="stat-note">Avg score: ${fmt(worst.avgScore)}</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Widest Spread</div>
+      <div class="stat-value">${widest.sector}</div>
+      <div class="stat-note">Range: ${fmt(widest.range)}</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-label">Most Consistent</div>
+      <div class="stat-value">${tightest.sector}</div>
+      <div class="stat-note">Range: ${fmt(tightest.range)}</div>
+    </div>
+  `;
+}
 
-    container.innerHTML = `
-      <article class="summary-card">
-        <div class="summary-label">Best Sector</div>
-        <div class="summary-value">${best.sector}</div>
-        <div class="summary-meta">Avg score: ${formatScore(best.avgScore)}</div>
-      </article>
+function renderSectorList(sectors) {
+  const list = document.getElementById("sectorLeaderboardList");
+  if (!list) return;
 
-      <article class="summary-card">
-        <div class="summary-label">Worst Sector</div>
-        <div class="summary-value">${worst.sector}</div>
-        <div class="summary-meta">Avg score: ${formatScore(worst.avgScore)}</div>
-      </article>
+  list.innerHTML = sectors.map(sector => `
+    <div class="leaderboard-item">
+      <div>
+        <div class="leaderboard-name">${sector.rank}. ${sector.sector}</div>
+        <div class="leaderboard-meta">
+          ${sector.count} companies • Median ${fmt(sector.medianScore)} • Range ${fmt(sector.range)}
+        </div>
+      </div>
+      <div class="leaderboard-score">${fmt(sector.avgScore)}</div>
+    </div>
+  `).join("");
+}
 
-      <article class="summary-card">
-        <div class="summary-label">Widest Spread</div>
-        <div class="summary-value">${widestSpread.sector}</div>
-        <div class="summary-meta">Range: ${formatScore(widestSpread.range)}</div>
-      </article>
+function renderTable(sectors) {
+  const tbody = document.getElementById("sectorTableBody");
+  if (!tbody) return;
 
-      <article class="summary-card">
-        <div class="summary-label">Most Consistent</div>
-        <div class="summary-value">${mostCompact.sector}</div>
-        <div class="summary-meta">Range: ${formatScore(mostCompact.range)}</div>
-      </article>
-    `;
-  }
+  tbody.innerHTML = sectors.map(sector => `
+    <tr>
+      <td style="padding:12px;">${sector.rank}</td>
+      <td style="padding:12px;">${sector.sector}</td>
+      <td style="padding:12px;">${sector.count}</td>
+      <td style="padding:12px;">${fmt(sector.avgScore)}</td>
+      <td style="padding:12px;">${fmt(sector.medianScore)}</td>
+      <td style="padding:12px;">${sector.bestCompany}</td>
+      <td style="padding:12px;">${sector.worstCompany}</td>
+      <td style="padding:12px;">${fmt(sector.range)}</td>
+    </tr>
+  `).join("");
+}
 
-  function renderBarChart(sectors) {
-    const target = document.getElementById("sectorBarChart");
-    if (!target) return;
-
-    Plotly.newPlot(
-      target,
-      [
-        {
-          type: "bar",
-          orientation: "h",
-          x: sectors.map((sector) => sector.avgScore),
-          y: sectors.map((sector) => sector.sector),
-          text: sectors.map((sector) => formatScore(sector.avgScore)),
-          textposition: "outside",
-          cliponaxis: false,
-          hovertemplate:
-            "<b>%{y}</b><br>Average score: %{x:.3f}<extra></extra>"
-        }
-      ],
-      {
-        paper_bgcolor: "transparent",
-        plot_bgcolor: "transparent",
-        margin: { l: 180, r: 40, t: 10, b: 40 },
-        xaxis: {
-          title: "Average Exposure Score",
-          zeroline: false,
-          gridcolor: "rgba(255,255,255,0.08)"
-        },
-        yaxis: {
-          automargin: true,
-          categoryorder: "array",
-          categoryarray: sectors.map((sector) => sector.sector)
-        },
-        font: {
-          color: "#edf2f7",
-          family: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        }
-      },
-      { responsive: true, displayModeBar: false }
-    );
-  }
-
-  function renderBoxPlot(sectors) {
-    const target = document.getElementById("sectorBoxPlot");
-    if (!target) return;
-
-    const traces = sectors.map((sector) => ({
-      type: "box",
-      name: sector.sector,
-      y: sector.companyScores,
-      boxpoints: "outliers",
-      hovertemplate:
-        "<b>" + sector.sector + "</b><br>Score: %{y:.3f}<extra></extra>"
-    }));
-
-    Plotly.newPlot(
-      target,
-      traces,
-      {
-        paper_bgcolor: "transparent",
-        plot_bgcolor: "transparent",
-        margin: { l: 60, r: 30, t: 10, b: 110 },
-        yaxis: {
-          title: "Company Exposure Score",
-          zeroline: false,
-          gridcolor: "rgba(255,255,255,0.08)"
-        },
-        xaxis: {
-          tickangle: -30
-        },
-        font: {
-          color: "#edf2f7",
-          family: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        }
-      },
-      { responsive: true, displayModeBar: false }
-    );
-  }
-
-  function renderStackedChart(sectors) {
-    const target = document.getElementById("sectorStackedChart");
-    if (!target) return;
-
-    Plotly.newPlot(
-      target,
-      [
-        {
-          type: "bar",
-          name: "Climate Targets",
-          x: sectors.map((sector) => sector.sector),
-          y: sectors.map((sector) => sector.avgClimateTargets),
-          hovertemplate: "<b>%{x}</b><br>Climate Targets: %{y:.3f}<extra></extra>"
-        },
-        {
-          type: "bar",
-          name: "Investment & Transition",
-          x: sectors.map((sector) => sector.sector),
-          y: sectors.map((sector) => sector.avgInvestmentTransition),
-          hovertemplate: "<b>%{x}</b><br>Investment & Transition: %{y:.3f}<extra></extra>"
-        },
-        {
-          type: "bar",
-          name: "Climate Reporting",
-          x: sectors.map((sector) => sector.sector),
-          y: sectors.map((sector) => sector.avgClimateReporting),
-          hovertemplate: "<b>%{x}</b><br>Climate Reporting: %{y:.3f}<extra></extra>"
-        }
-      ],
-      {
-        barmode: "stack",
-        paper_bgcolor: "transparent",
-        plot_bgcolor: "transparent",
-        margin: { l: 60, r: 30, t: 10, b: 110 },
-        yaxis: {
-          title: "Average Component Score",
-          zeroline: false,
-          gridcolor: "rgba(255,255,255,0.08)"
-        },
-        xaxis: {
-          tickangle: -30
-        },
-        legend: {
-          orientation: "h",
-          y: 1.12,
-          x: 0
-        },
-        font: {
-          color: "#edf2f7",
-          family: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        }
-      },
-      { responsive: true, displayModeBar: false }
-    );
-  }
-
-  function renderTable(sectors) {
-    const tbody = document.querySelector("#sectorTable tbody");
-    if (!tbody) return;
-
-    tbody.innerHTML = sectors.map((sector) => `
-      <tr>
-        <td>${sector.rank}</td>
-        <td>${sector.sector}</td>
-        <td>${sector.count}</td>
-        <td>${formatScore(sector.avgScore)}</td>
-        <td>${formatScore(sector.medianScore)}</td>
-        <td>${sector.bestCompany}</td>
-        <td>${sector.worstCompany}</td>
-        <td>${formatScore(sector.range)}</td>
-      </tr>
-    `).join("");
-  }
-
-  function init() {
-    const data = window.RAW_DATA;
-
-    if (!Array.isArray(data) || data.length === 0) {
-      const summary = document.getElementById("sectorSummary");
-      if (summary) {
-        summary.innerHTML = `
-          <article class="summary-card summary-card-error">
-            <div class="summary-label">Data not found</div>
-            <div class="summary-value">RAW_DATA is missing</div>
-            <div class="summary-meta">
-              Add your dataset to assets/js/data.js as: const RAW_DATA = [ ... ];
-            </div>
-          </article>
-        `;
-      }
-      return;
+function renderBarChart(sectors) {
+  Plotly.newPlot("sectorBarChart", [
+    {
+      type: "bar",
+      orientation: "h",
+      x: sectors.map(s => s.avgScore),
+      y: sectors.map(s => s.sector),
+      text: sectors.map(s => fmt(s.avgScore)),
+      textposition: "outside",
+      cliponaxis: false,
+      hovertemplate: "<b>%{y}</b><br>Average score: %{x:.3f}<extra></extra>"
     }
+  ], {
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    margin: { l: 180, r: 40, t: 10, b: 40 },
+    xaxis: { title: "Average ESG Exposure Score" },
+    yaxis: { automargin: true }
+  }, {
+    responsive: true,
+    displayModeBar: false
+  });
+}
 
-    const sectors = buildSectorData(data);
-    renderSummaryCards(sectors);
-    renderBarChart(sectors);
-    renderBoxPlot(sectors);
-    renderStackedChart(sectors);
-    renderTable(sectors);
+function renderBoxPlot(sectors) {
+  const traces = sectors.map(s => ({
+    type: "box",
+    name: s.sector,
+    y: s.companyScores,
+    boxpoints: "outliers",
+    hovertemplate: "<b>" + s.sector + "</b><br>Score: %{y:.3f}<extra></extra>"
+  }));
+
+  Plotly.newPlot("sectorBoxPlot", traces, {
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    margin: { l: 60, r: 30, t: 10, b: 110 },
+    yaxis: { title: "Company ESG Exposure Score" },
+    xaxis: { tickangle: -30 }
+  }, {
+    responsive: true,
+    displayModeBar: false
+  });
+}
+
+function renderStackedChart(sectors) {
+  Plotly.newPlot("sectorStackedChart", [
+    {
+      type: "bar",
+      name: "Climate Targets",
+      x: sectors.map(s => s.sector),
+      y: sectors.map(s => s.avgClimateTargets)
+    },
+    {
+      type: "bar",
+      name: "Investment & Transition",
+      x: sectors.map(s => s.sector),
+      y: sectors.map(s => s.avgInvestmentTransition)
+    },
+    {
+      type: "bar",
+      name: "Climate Reporting",
+      x: sectors.map(s => s.sector),
+      y: sectors.map(s => s.avgClimateReporting)
+    }
+  ], {
+    barmode: "stack",
+    paper_bgcolor: "rgba(0,0,0,0)",
+    plot_bgcolor: "rgba(0,0,0,0)",
+    margin: { l: 60, r: 30, t: 10, b: 110 },
+    yaxis: { title: "Average Component Score" },
+    xaxis: { tickangle: -30 }
+  }, {
+    responsive: true,
+    displayModeBar: false
+  });
+}
+
+function initSectorsPage() {
+  if (!Array.isArray(RAW_DATA)) {
+    console.error("RAW_DATA is not available.");
+    return;
   }
 
-  init();
-})();
+  const sectors = buildSectorData(RAW_DATA);
+  renderStats(sectors);
+  renderSectorList(sectors);
+  renderTable(sectors);
+  renderBarChart(sectors);
+  renderBoxPlot(sectors);
+  renderStackedChart(sectors);
+}
+
+document.addEventListener("DOMContentLoaded", initSectorsPage);
