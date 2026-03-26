@@ -25,7 +25,7 @@ function renderDistributionChart(data) {
   xaxis: {
     title: {
       text: 'Environment Score',
-      font: { size: 11 }
+      font: { size: 10 }
     },
     tickfont: { size: 10 },
     tickformat: '.2f'
@@ -34,7 +34,7 @@ function renderDistributionChart(data) {
   yaxis: {
     title: {
       text: 'Number of Companies',
-      font: { size: 11 }
+      font: { size: 10 }
     },
     tickfont: { size: 10 }
   }
