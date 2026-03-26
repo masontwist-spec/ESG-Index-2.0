@@ -123,6 +123,7 @@ tbody tr:hover { background: #fbfcfa; }
   flex-direction: column;
   justify-content: space-between;
 }
+
 .sector-stat-value,
 .stat-value {
   font-size: clamp(28px, 3vw, 52px);
