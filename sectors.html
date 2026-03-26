@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sectors | FTSE 100 ESG Exposure Index</title>
-  <link rel="stylesheet" href="assets/css/sectors.css" />
+ <link rel="stylesheet" href="sectors.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
@@ -89,20 +89,7 @@
       Prosperity Institute's FTSE 100 ESG Exposure Index.
     </div>
   </footer>
-
-  <!--
-    IMPORTANT:
-    This page expects a global RAW_DATA array to exist before sectors.js runs.
-
-    Easiest setup:
-    1) Put your company dataset into assets/js/data.js
-    2) Make sure it looks like: const RAW_DATA = [ ... ];
-    3) Keep the script tag below enabled.
-
-    If your data already lives somewhere else, just replace this script tag
-    with the correct file path.
-  -->
-  <script src="assets/js/data.js"></script>
-  <script src="assets/js/sectors.js"></script>
+  <script src="data.js"></script>
+<script src="sectors.js"></script>
 </body>
 </html>
