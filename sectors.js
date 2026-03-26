@@ -114,6 +114,9 @@ function renderBarChart(sectors) {
       text: sectors.map(s => fmt(s.avgScore)),
       textposition: "outside",
       cliponaxis: false,
+      marker: {
+  color: "#2ecc71"
+},
       hovertemplate: "<b>%{y}</b><br>Average score: %{x:.3f}<extra></extra>"
     }
   ], {
