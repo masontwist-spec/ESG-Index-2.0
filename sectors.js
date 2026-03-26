@@ -86,23 +86,6 @@ function renderStats(sectors) {
   `;
 }
 
-function renderSectorList(sectors) {
-  const list = document.getElementById("sectorLeaderboardList");
-  if (!list) return;
-
-  list.innerHTML = sectors.map(sector => `
-    <div class="leaderboard-item">
-      <div>
-        <div class="leaderboard-name">${sector.rank}. ${sector.sector}</div>
-        <div class="leaderboard-meta">
-          ${sector.count} companies • Median ${fmt(sector.medianScore)} • Range ${fmt(sector.range)}
-        </div>
-      </div>
-      <div class="leaderboard-score">${fmt(sector.avgScore)}</div>
-    </div>
-  `).join("");
-}
-
 function renderTable(sectors) {
   const tbody = document.getElementById("sectorTableBody");
   if (!tbody) return;
