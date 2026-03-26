@@ -116,3 +116,19 @@ tbody tr:hover { background: #fbfcfa; }
   .lb-row { grid-template-columns: 40px minmax(0,1fr); }
   .lb-score { text-align: left; grid-column: 2; }
 }
+.sector-stat-card,
+.stat-card {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sector-stat-value,
+.stat-value {
+  font-size: clamp(28px, 3vw, 52px);
+  line-height: 1.0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+}
