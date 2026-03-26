@@ -115,7 +115,7 @@ function renderBarChart(sectors) {
       textposition: "outside",
       cliponaxis: false,
       marker: {
-  color: "#2ecc71"
+  color: "#2e8b57"
 },
       hovertemplate: "<b>%{y}</b><br>Average score: %{x:.3f}<extra></extra>"
     }
