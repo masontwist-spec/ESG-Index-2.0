@@ -4,13 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sector Analysis | FTSE 100 ESG Exposure Index</title>
-
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script defer src="data.js"></script>
 <script defer src="sectors.js"></script>
 </head>
-
 <body>
 
 <header>
@@ -19,7 +17,6 @@
       <div class="brand-mark">↗</div>
       <div class="brand-name">Prosperity Institute FTSE 100 <strong>ESG Exposure</strong> Index</div>
     </div>
-
     <nav class="nav-links">
       <a href="index.html">Overview</a>
       <a href="rankings.html">Rankings</a>
@@ -44,22 +41,10 @@
     <div class="hero-panel">
       <h3>Interpretation</h3>
       <p>This page aggregates company-level environment exposure scores by sector.</p>
-
       <div class="signal-list">
-        <div class="signal">
-          <span class="name">Best sector</span>
-          <span class="tag">Lowest average</span>
-        </div>
-
-        <div class="signal">
-          <span class="name">Worst sector</span>
-          <span class="tag" style="background:rgba(240,120,120,0.12);color:#f0a0a0;">Highest average</span>
-        </div>
-
-        <div class="signal">
-          <span class="name">Ranking logic</span>
-          <span class="tag">Ascending</span>
-        </div>
+        <div class="signal"><span class="name">Best sector</span><span class="tag">Lowest average</span></div>
+        <div class="signal"><span class="name">Worst sector</span><span class="tag" style="background:rgba(240,120,120,0.12);color:#f0a0a0;">Highest average</span></div>
+        <div class="signal"><span class="name">Ranking logic</span><span class="tag">Ascending</span></div>
       </div>
     </div>
   </div>
@@ -69,72 +54,57 @@
   <div class="wrap stats-grid" id="sectorStatsGrid"></div>
 </div>
 
-<!-- ===== SECTOR BAR CHART ===== -->
 <section class="page">
   <div class="wrap">
-    <div class="card">
-
+    <div class="card sector-panel-card">
       <div class="section-head sector-head">
         <div>
           <h2>Sector Rankings</h2>
           <p>Average environment exposure score by sector.</p>
         </div>
       </div>
-
       <div id="sectorBarChart" style="width:100%;height:620px;"></div>
-
     </div>
   </div>
 </section>
 
-<!-- ===== BOX PLOT ===== -->
 <section class="page">
   <div class="wrap">
-    <div class="card">
-
+    <div class="card sector-panel-card">
       <div class="section-head sector-head">
         <div>
           <h2>Score Distribution by Sector</h2>
           <p>Spread of company environment scores inside each sector.</p>
         </div>
       </div>
-
       <div id="sectorBoxPlot" style="width:100%;height:560px;"></div>
-
     </div>
   </div>
 </section>
 
-<!-- ===== STACKED CHART ===== -->
 <section class="page">
   <div class="wrap">
-    <div class="card">
-
+    <div class="card sector-panel-card">
       <div class="section-head sector-head">
         <div>
           <h2>Average Component Breakdown</h2>
-          <p>Average Climate Targets, Investment & Transition, and Climate Reporting by sector.</p>
+          <p>Average Climate Targets, Investment &amp; Transition, and Climate Reporting by sector.</p>
         </div>
       </div>
-
       <div id="sectorStackedChart" style="width:100%;height:560px;"></div>
-
     </div>
   </div>
 </section>
 
-<!-- ===== TABLE ===== -->
 <section class="page">
   <div class="wrap">
-    <div class="card">
-
+    <div class="card sector-panel-card">
       <div class="section-head sector-head">
         <div>
           <h2>Sector Table</h2>
           <p>Lower average scores rank better.</p>
         </div>
       </div>
-
       <div style="overflow-x:auto;">
         <table style="width:100%; border-collapse:collapse;">
           <thead>
@@ -149,19 +119,15 @@
               <th style="text-align:left; padding:12px;">Range</th>
             </tr>
           </thead>
-
           <tbody id="sectorTableBody"></tbody>
         </table>
       </div>
-
     </div>
   </div>
 </section>
 
 <footer class="foot">
-  <div class="wrap">
-    Prosperity Institute's FTSE 100 <strong>ESG Exposure</strong> Index.
-  </div>
+  <div class="wrap">Prosperity Institute's FTSE 100 <strong>ESG Exposure</strong> Index.</div>
 </footer>
 
 </body>
