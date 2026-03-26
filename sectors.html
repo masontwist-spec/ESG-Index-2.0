@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sectors | ESG Exposure Index 2026</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Sector Analysis</h1>
+    <nav>
+      <a href="index.html">Overview</a>
+      <a href="rankings.html">Rankings</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="companies.html">Companies</a>
+      <a href="sectors.html" class="active">Sectors</a>
+    </nav>
+    <p>
+      Sector scores are calculated as the average ESG Exposure score of constituent companies.
+      Lower scores are better under this contrarian methodology.
+    </p>
+  </header>
+
+  <main>
+    <section id="sector-summary" class="card-grid"></section>
+
+    <section class="chart-card">
+      <h2>Sector Ranking</h2>
+      <div id="sectorBarChart"></div>
+    </section>
+
+    <section class="chart-card">
+      <h2>Sector Score Distribution</h2>
+      <div id="sectorBoxPlot"></div>
+    </section>
+
+    <section class="chart-card">
+      <h2>Average E / S / G Contribution by Sector</h2>
+      <div id="sectorStackedBar"></div>
+    </section>
+
+    <section class="table-card">
+      <h2>Sector Detail Table</h2>
+      <table id="sectorTable">
+        <thead>
+          <tr>
+            <th>Sector</th>
+            <th>Companies</th>
+            <th>Avg Score</th>
+            <th>Median</th>
+            <th>Best Company</th>
+            <th>Worst Company</th>
+            <th>Range</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/sectors.js"></script>
+</body>
+</html>
